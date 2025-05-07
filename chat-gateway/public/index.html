@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Simple Distribuido</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    #messages { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; }
+  </style>
+</head>
+<body>
+  <h2>Chat Microservicio</h2>
+
+  <label for="name">Tu nombre:</label>
+  <input type="text" id="name" placeholder="Ej. Cliente 1"><br><br>
+
+  <label for="message">Mensaje:</label>
+  <input type="text" id="message" placeholder="Escribe un mensaje">
+  <button onclick="sendMessage()">Enviar</button>
+
+  <h3>Mensajes:</h3>
+  <div id="messages"></div>
+
+  <script>
+    async function sendMessage() {
+      const name = document.getElementById("name").value;
+      const message = document.getElementById("message").value;
+      if (!name || !message) return alert("Llena todos los campos.");
+
+      await fetch('/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: name, message: message })
+      });
+
+      document.getElementById("message").value = "";
+      loadMessages();
+    }
+
+    async function loadMessages() {
+      const res = await fetch('/messages');
+      const data = await res.json();
+      const messagesDiv = document.getElementById("messages");
+      messagesDiv.innerHTML = data.map(m => `<p><strong>${m.from}:</strong> ${m.message}</p>`).join('');
+    }
+
+    setInterval(loadMessages, 1000);
+    loadMessages();
+  </script>
+</body>
+</html>

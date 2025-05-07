@@ -1,0 +1,21 @@
+
+services:
+  chat-gateway:
+    build: ./chat-gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - message-service
+    networks:
+      - chat-network
+
+  message-service:
+    build: ./message-service
+    ports:
+      - "3001:3001"
+    networks:
+      - chat-network
+
+networks:
+  chat-network:
+    driver: bridge
